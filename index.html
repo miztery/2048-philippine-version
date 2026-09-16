@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        2048 Philippine PESO Version by CGWCEISC-DRDU
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         TITLE
+    ====================================================== -->
+
+    <h1>
+        2048 Philippine PESO Version
+    </h1>
+
+
+    <!-- =====================================================
+         PLAYER NAME
+    ====================================================== -->
+
+    <div id="playerBox">
+
+        <h2>
+            Enter Player Name
+        </h2>
+
+
+        <input
+            id="playerName"
+            type="text"
+            placeholder="Player Name"
+            maxlength="30"
+            autocomplete="off"
+        >
+
+
+        <br>
+        <br>
+
+
+        <button onclick="startPlayerGame()">
+            START GAME
+        </button>
+
+    </div>
+
+
+    <!-- =====================================================
+         MAIN GAME LAYOUT
+    ====================================================== -->
+
+    <div id="gameLayout">
+
+
+        <!-- =================================================
+             GAME AREA
+        ================================================== -->
+
+        <div id="gameArea">
+
+            <h2 id="playerDisplay">
+                Player:
+            </h2>
+
+
+            <div id="score">
+                Score: 0
+            </div>
+
+
+            <!-- 2048 BOARD -->
+
+            <div id="board">
+
+                <div class="tile"></div>
+                <div class="tile"></div>
+                <div class="tile"></div>
+                <div class="tile"></div>
+
+                <div class="tile"></div>
+                <div class="tile"></div>
+                <div class="tile"></div>
+                <div class="tile"></div>
+
+                <div class="tile"></div>
+                <div class="tile"></div>
+                <div class="tile"></div>
+                <div class="tile"></div>
+
+                <div class="tile"></div>
+                <div class="tile"></div>
+                <div class="tile"></div>
+                <div class="tile"></div>
+
+            </div>
+
+
+            <br>
+
+
+            <button onclick="newGame()">
+                NEW GAME
+            </button>
+
+        </div>
+
+
+        <!-- =================================================
+             LEADERBOARD
+        ================================================== -->
+
+        <div id="leaderboardBox">
+
+            <h2>
+                🏆 Leaderboard
+            </h2>
+
+
+            <table id="leaderboard">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Rank
+                        </th>
+
+                        <th>
+                            Player
+                        </th>
+
+                        <th>
+                            Score
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="leaderboardBody">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         GAME INFORMATION HOVER BUTTON
+    ====================================================== -->
+
+    <div
+        id="gameInfoContainer"
+        tabindex="0"
+    >
+
+
+        <!-- HOVER BUTTON -->
+
+        <button
+            id="gameInfoButton"
+            type="button"
+        >
+            🎮 Game Information
+        </button>
+
+
+        <!-- =================================================
+             INFORMATION PANEL
+        ================================================== -->
+
+        <div id="gameInfoPanel">
+
+
+            <h2>
+                🎮 Game Information
+            </h2>
+
+
+            <div id="gameInfoContent">
+
+
+                <!-- DEVELOPER -->
+
+                <div class="infoBox">
+
+                    <div class="infoIcon">
+                        👨‍💻
+                    </div>
+
+                    <div class="infoText">
+
+                        <strong>
+                            Developer
+                        </strong>
+
+                        <span>
+                            CGWCEISC-DRDU
+                        </span>
+                        <span>
+                            SN2 Cadano PCG
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <!-- VERSION -->
+
+                <div class="infoBox">
+
+                    <div class="infoIcon">
+                        📌
+                    </div>
+
+                    <div class="infoText">
+
+                        <strong>
+                            Version
+                        </strong>
+
+                        <span>
+                            Version 1.0
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- UNIT -->
+
+                <div class="infoBox">
+
+                    <div class="infoIcon">
+                        🛡️
+                    </div>
+
+                    <div class="infoText">
+
+                        <strong>
+                            Unit
+                        </strong>
+
+                        <span>
+                            CGWCEISC-DRDU
+                        </span>
+                        <span>
+                            Doctrine, Research and Development Unit
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                
+
+
+                <!-- COPYRIGHT -->
+
+                <div class="infoBox">
+
+                    <div class="infoIcon">
+                        ©️
+                    </div>
+
+                    <div class="infoText">
+
+                        <strong>
+                            Copyright
+                        </strong>
+
+                        <span>
+                            © 2026 CGWCEISC-DRDU
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <script src="game.js"></script>
+
+
+</body>
+
+</html>
