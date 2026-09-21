@@ -1,801 +1,1162 @@
-var board = [];
-var score = 0;
-var playerName = "";
-var gameOver = false;
-var gameWon = false;
+/* =========================================================
+   2048 PHILIPPINE PESO VERSION
+   CGWCEISC-DRDU
+========================================================= */
 
-var images = {
-2: "images/2.jpg",
-4: "images/4.jpg",
-8: "images/8.jpg",
-16: "images/16.jpg",
-32: "images/32.jpg",
-64: "images/64.jpg",
-128: "images/128.jpg",
-256: "images/256.jpg",
-512: "images/512.jpg",
-1024: "images/1024.jpg",
-2048: "images/2048.jpg"
+let board = [];
+let score = 0;
+let playerName = "";
+let gameStarted = false;
+let gameEnded = false;
+
+
+/* =========================================================
+   IMAGE MAPPING
+========================================================= */
+
+const images = {
+    2: "images/2.jpg",
+    4: "images/4.jpg",
+    8: "images/8.jpg",
+    16: "images/16.jpg",
+    32: "images/32.jpg",
+    64: "images/64.jpg",
+    128: "images/128.jpg",
+    256: "images/256.jpg",
+    512: "images/512.jpg",
+    1024: "images/1024.jpg",
+    2048: "images/2048.jpg"
 };
 
-// ==============================
-// START PLAYER
-// ==============================
+
+/* =========================================================
+   HTML ELEMENTS
+========================================================= */
+
+const playerBox = document.getElementById("playerBox");
+const playerNameInput = document.getElementById("playerName");
+const gameArea = document.getElementById("gameArea");
+const playerDisplay = document.getElementById("playerDisplay");
+const scoreElement = document.getElementById("score");
+const boardElement = document.getElementById("board");
+const leaderboardBody = document.getElementById("leaderboardBody");
+
+
+/* =========================================================
+   LEADERBOARD
+========================================================= */
+
+let leaderboard = [];
+
+try {
+
+    const savedLeaderboard =
+        localStorage.getItem("peso2048Leaderboard");
+
+    if (savedLeaderboard) {
+
+        leaderboard =
+            JSON.parse(savedLeaderboard);
+
+        if (!Array.isArray(leaderboard)) {
+
+            leaderboard = [];
+
+        }
+
+    }
+
+} catch (error) {
+
+    leaderboard = [];
+
+}
+
+
+/* =========================================================
+   START PLAYER GAME
+========================================================= */
 
 function startPlayerGame() {
 
-
-var input = document.getElementById("playerName");
-
-if (!input) {
-    alert("ERROR: playerName input not found.");
-    return;
-}
-
-var name = input.value.trim();
-
-if (name === "") {
-    alert("Please enter your name first.");
-    input.focus();
-    return;
-}
-
-playerName = name;
-
-document.getElementById("playerDisplay").innerHTML =
-    "Player: " + playerName;
-
-document.getElementById("playerBox").style.display = "none";
-
-document.getElementById("gameArea").style.display = "block";
-
-startGame();
+    const name =
+        playerNameInput.value.trim();
 
 
-}
+    if (name === "") {
 
-// ==============================
-// START GAME
-// ==============================
+        alert("Please enter your name first.");
 
-function startGame() {
+        playerNameInput.focus();
+
+        return;
+
+    }
 
 
-board = [
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0]
-];
+    playerName =
+        name.substring(0, 30);
 
-score = 0;
-gameOver = false;
-gameWon = false;
 
-addTile();
-addTile();
+    score = 0;
 
-draw();
+    gameStarted = true;
 
+    gameEnded = false;
+
+
+    playerDisplay.textContent =
+        "Player: " + playerName;
+
+
+    playerBox.style.display = "none";
+
+    gameArea.style.display = "block";
+
+
+    createNewGame();
 
 }
 
-// ==============================
-// NEW GAME
-// ==============================
+
+/*
+ * IMPORTANT:
+ * Make the function available to
+ * onclick="startPlayerGame()"
+ */
+
+window.startPlayerGame =
+    startPlayerGame;
+
+
+/* =========================================================
+   CREATE NEW GAME
+========================================================= */
+
+function createNewGame() {
+
+    board = [];
+
+    score = 0;
+
+    gameEnded = false;
+
+
+    for (let row = 0; row < 4; row++) {
+
+        board[row] = [];
+
+        for (let col = 0; col < 4; col++) {
+
+            board[row][col] = 0;
+
+        }
+
+    }
+
+
+    addRandomTile();
+
+    addRandomTile();
+
+
+    updateBoard();
+
+}
+
+
+/* =========================================================
+   NEW GAME BUTTON
+========================================================= */
 
 function newGame() {
 
+    if (!gameStarted) {
 
-if (playerName === "") {
-    return;
-}
+        return;
 
-startGame();
-
-
-}
-
-// ==============================
-// ADD TILE
-// ==============================
-
-function addTile() {
-
-
-var empty = [];
-var r;
-var c;
-
-for (r = 0; r < 4; r++) {
-
-    for (c = 0; c < 4; c++) {
-
-        if (board[r][c] === 0) {
-            empty.push([r, c]);
-        }
     }
-}
 
-if (empty.length === 0) {
-    return;
-}
 
-var position =
-    empty[Math.floor(Math.random() * empty.length)];
-
-board[position[0]][position[1]] =
-    Math.random() < 0.9 ? 2 : 4;
-
+    createNewGame();
 
 }
 
-// ==============================
-// DRAW
-// ==============================
 
-function draw() {
+window.newGame = newGame;
 
 
-var boardElement =
-    document.getElementById("board");
+/* =========================================================
+   ADD RANDOM TILE
+========================================================= */
 
-if (!boardElement) {
-    return;
-}
+function addRandomTile() {
 
-boardElement.innerHTML = "";
+    const emptyCells = [];
 
-var r;
-var c;
 
-for (r = 0; r < 4; r++) {
+    for (let row = 0; row < 4; row++) {
 
-    for (c = 0; c < 4; c++) {
+        for (let col = 0; col < 4; col++) {
 
-        var tile =
-            document.createElement("div");
+            if (board[row][col] === 0) {
 
-        tile.className = "tile";
+                emptyCells.push({
+                    row: row,
+                    col: col
+                });
 
-        var value = board[r][c];
+            }
 
-        if (value !== 0) {
-
-            var img =
-                document.createElement("img");
-
-            img.src = images[value];
-
-            img.alt = value;
-
-            tile.appendChild(img);
         }
 
-        boardElement.appendChild(tile);
     }
-}
-
-document.getElementById("score").innerHTML =
-    "Score: " + score;
 
 
-}
+    if (emptyCells.length === 0) {
 
-// ==============================
-// COMPRESS
-// ==============================
+        return;
 
-function compress(row) {
-
-
-var result = [];
-var i;
-
-for (i = 0; i < row.length; i++) {
-
-    if (row[i] !== 0) {
-        result.push(row[i]);
     }
+
+
+    const randomIndex =
+        Math.floor(
+            Math.random() * emptyCells.length
+        );
+
+
+    const cell =
+        emptyCells[randomIndex];
+
+
+    board[cell.row][cell.col] =
+        Math.random() < 0.9 ? 2 : 4;
+
 }
 
-while (result.length < 4) {
-    result.push(0);
-}
 
-return result;
+/* =========================================================
+   UPDATE BOARD
+========================================================= */
 
+function updateBoard() {
 
-}
-
-// ==============================
-// MERGE
-// ==============================
-
-function merge(row) {
+    boardElement.innerHTML = "";
 
 
-var i;
+    for (let row = 0; row < 4; row++) {
 
-for (i = 0; i < 3; i++) {
+        for (let col = 0; col < 4; col++) {
 
-    if (
-        row[i] !== 0 &&
-        row[i] === row[i + 1]
-    ) {
+            const tile =
+                document.createElement("div");
 
-        row[i] = row[i] * 2;
 
-        score = score + row[i];
+            tile.className = "tile";
 
-        row[i + 1] = 0;
 
-        if (row[i] === 2048) {
-            winGame();
+            const value =
+                board[row][col];
+
+
+            if (value !== 0) {
+
+                const imgPath =
+                    images[value];
+
+
+                if (imgPath) {
+
+                    const img =
+                        document.createElement("img");
+
+
+                    img.src = imgPath;
+
+                    img.alt =
+                        "₱" + value;
+
+
+                    img.onerror =
+                        function () {
+
+                            img.remove();
+
+                            showTileNumber(
+                                tile,
+                                value
+                            );
+
+                        };
+
+
+                    tile.appendChild(img);
+
+                }
+
+                else {
+
+                    showTileNumber(
+                        tile,
+                        value
+                    );
+
+                }
+
+            }
+
+
+            boardElement.appendChild(tile);
+
         }
+
     }
+
+
+    scoreElement.textContent =
+        "Score: " + score;
+
 }
 
-return row;
 
+/* =========================================================
+   FALLBACK TILE NUMBER
+========================================================= */
+
+function showTileNumber(tile, value) {
+
+    const valueElement =
+        document.createElement("div");
+
+
+    valueElement.className =
+        "tileValue";
+
+
+    valueElement.textContent =
+        "₱" + value;
+
+
+    tile.appendChild(
+        valueElement
+    );
 
 }
 
-// ==============================
-// MOVE LEFT
-// ==============================
+
+/* =========================================================
+   KEYBOARD CONTROLS
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    function (event) {
+
+        /*
+         * Prevent the browser from scrolling
+         * when using arrow keys.
+         */
+
+        if (
+            event.key === "ArrowUp" ||
+            event.key === "ArrowDown" ||
+            event.key === "ArrowLeft" ||
+            event.key === "ArrowRight"
+        ) {
+
+            event.preventDefault();
+
+        }
+
+
+        /*
+         * Game must be active.
+         */
+
+        if (!gameStarted || gameEnded) {
+
+            return;
+
+        }
+
+
+        /*
+         * Don't move the game while typing
+         * the player's name.
+         */
+
+        if (
+            document.activeElement ===
+            playerNameInput
+        ) {
+
+            return;
+
+        }
+
+
+        if (event.key === "ArrowLeft") {
+
+            moveLeft();
+
+        }
+
+        else if (event.key === "ArrowRight") {
+
+            moveRight();
+
+        }
+
+        else if (event.key === "ArrowUp") {
+
+            moveUp();
+
+        }
+
+        else if (event.key === "ArrowDown") {
+
+            moveDown();
+
+        }
+
+    },
+    {
+        passive: false
+    }
+);
+
+
+/* =========================================================
+   MOVE LEFT
+========================================================= */
 
 function moveLeft() {
 
+    let moved = false;
 
-var changed = false;
-var r;
 
-for (r = 0; r < 4; r++) {
+    for (let row = 0; row < 4; row++) {
 
-    var old =
-        JSON.stringify(board[r]);
+        const oldLine =
+            [...board[row]];
 
-    var row =
-        compress(board[r]);
 
-    row =
-        merge(row);
+        let line =
+            board[row].filter(
+                value => value !== 0
+            );
 
-    row =
-        compress(row);
 
-    board[r] = row;
+        line =
+            mergeLine(line);
 
-    if (
-        old !==
-        JSON.stringify(row)
-    ) {
-        changed = true;
+
+        while (line.length < 4) {
+
+            line.push(0);
+
+        }
+
+
+        board[row] =
+            line;
+
+
+        if (
+            JSON.stringify(oldLine) !==
+            JSON.stringify(line)
+        ) {
+
+            moved = true;
+
+        }
+
     }
+
+
+    afterMove(moved);
+
 }
 
-return changed;
 
+/* =========================================================
+   MOVE RIGHT
+========================================================= */
+
+function moveRight() {
+
+    let moved = false;
+
+
+    for (let row = 0; row < 4; row++) {
+
+        const oldLine =
+            [...board[row]];
+
+
+        let line =
+            board[row].filter(
+                value => value !== 0
+            );
+
+
+        line.reverse();
+
+
+        line =
+            mergeLine(line);
+
+
+        while (line.length < 4) {
+
+            line.push(0);
+
+        }
+
+
+        line.reverse();
+
+
+        board[row] =
+            line;
+
+
+        if (
+            JSON.stringify(oldLine) !==
+            JSON.stringify(line)
+        ) {
+
+            moved = true;
+
+        }
+
+    }
+
+
+    afterMove(moved);
 
 }
 
-// ==============================
-// ROTATE
-// ==============================
 
-function rotate() {
+/* =========================================================
+   MOVE UP
+========================================================= */
+
+function moveUp() {
+
+    let moved = false;
 
 
-var newBoard = [
-    [],
-    [],
-    [],
-    []
-];
+    for (let col = 0; col < 4; col++) {
 
-var r;
-var c;
+        const oldLine = [
 
-for (c = 0; c < 4; c++) {
+            board[0][col],
+            board[1][col],
+            board[2][col],
+            board[3][col]
 
-    for (r = 3; r >= 0; r--) {
+        ];
 
-        newBoard[c].push(
-            board[r][c]
+
+        let line = [];
+
+
+        for (let row = 0; row < 4; row++) {
+
+            if (board[row][col] !== 0) {
+
+                line.push(
+                    board[row][col]
+                );
+
+            }
+
+        }
+
+
+        line =
+            mergeLine(line);
+
+
+        while (line.length < 4) {
+
+            line.push(0);
+
+        }
+
+
+        for (let row = 0; row < 4; row++) {
+
+            board[row][col] =
+                line[row];
+
+        }
+
+
+        const newLine = [
+
+            board[0][col],
+            board[1][col],
+            board[2][col],
+            board[3][col]
+
+        ];
+
+
+        if (
+            JSON.stringify(oldLine) !==
+            JSON.stringify(newLine)
+        ) {
+
+            moved = true;
+
+        }
+
+    }
+
+
+    afterMove(moved);
+
+}
+
+
+/* =========================================================
+   MOVE DOWN
+========================================================= */
+
+function moveDown() {
+
+    let moved = false;
+
+
+    for (let col = 0; col < 4; col++) {
+
+        const oldLine = [
+
+            board[0][col],
+            board[1][col],
+            board[2][col],
+            board[3][col]
+
+        ];
+
+
+        let line = [];
+
+
+        for (let row = 3; row >= 0; row--) {
+
+            if (board[row][col] !== 0) {
+
+                line.push(
+                    board[row][col]
+                );
+
+            }
+
+        }
+
+
+        line =
+            mergeLine(line);
+
+
+        while (line.length < 4) {
+
+            line.push(0);
+
+        }
+
+
+        for (let row = 3; row >= 0; row--) {
+
+            board[row][col] =
+                line[3 - row];
+
+        }
+
+
+        const newLine = [
+
+            board[0][col],
+            board[1][col],
+            board[2][col],
+            board[3][col]
+
+        ];
+
+
+        if (
+            JSON.stringify(oldLine) !==
+            JSON.stringify(newLine)
+        ) {
+
+            moved = true;
+
+        }
+
+    }
+
+
+    afterMove(moved);
+
+}
+
+
+/* =========================================================
+   MERGE LINE
+========================================================= */
+
+function mergeLine(line) {
+
+    const result = [];
+
+
+    for (let i = 0; i < line.length; i++) {
+
+        if (
+            i + 1 < line.length &&
+            line[i] === line[i + 1]
+        ) {
+
+            const merged =
+                line[i] * 2;
+
+
+            result.push(merged);
+
+
+            score += merged;
+
+
+            i++;
+
+        }
+
+        else {
+
+            result.push(
+                line[i]
+            );
+
+        }
+
+    }
+
+
+    return result;
+
+}
+
+
+/* =========================================================
+   AFTER MOVE
+========================================================= */
+
+function afterMove(moved) {
+
+    if (!moved) {
+
+        return;
+
+    }
+
+
+    addRandomTile();
+
+    updateBoard();
+
+
+    if (has2048()) {
+
+        setTimeout(
+            function () {
+
+                alert(
+                    "Congratulations " +
+                    playerName +
+                    "!\n\n" +
+                    "You reached ₱2048!"
+                );
+
+            },
+            100
         );
+
+        return;
+
     }
-}
-
-board = newBoard;
 
 
-}
+    if (!canMove()) {
 
-// ==============================
-// MOVE
-// ==============================
+        endGame();
 
-function move(direction) {
-
-
-if (gameOver) {
-    return;
-}
-
-if (!board || board.length !== 4) {
-    return;
-}
-
-var moved = false;
-
-
-if (direction === "left") {
-
-    moved = moveLeft();
-}
-
-
-if (direction === "right") {
-
-    rotate();
-    rotate();
-
-    moved = moveLeft();
-
-    rotate();
-    rotate();
-}
-
-
-if (direction === "up") {
-
-    rotate();
-    rotate();
-    rotate();
-
-    moved = moveLeft();
-
-    rotate();
-}
-
-
-if (direction === "down") {
-
-    rotate();
-
-    moved = moveLeft();
-
-    rotate();
-    rotate();
-    rotate();
-}
-
-
-if (moved) {
-
-    addTile();
-
-    draw();
-
-    if (checkGameOver()) {
-        finishGame();
     }
-}
-
 
 }
 
-// ==============================
-// GAME OVER CHECK
-// ==============================
 
-function checkGameOver() {
+/* =========================================================
+   CHECK 2048
+========================================================= */
 
+function has2048() {
 
-var r;
-var c;
+    for (let row = 0; row < 4; row++) {
 
-for (r = 0; r < 4; r++) {
+        for (let col = 0; col < 4; col++) {
 
-    for (c = 0; c < 4; c++) {
+            if (
+                board[row][col] === 2048
+            ) {
 
-        if (board[r][c] === 0) {
-            return false;
+                return true;
+
+            }
+
         }
 
-        if (
-            c < 3 &&
-            board[r][c] ===
-            board[r][c + 1]
-        ) {
-            return false;
-        }
-
-        if (
-            r < 3 &&
-            board[r][c] ===
-            board[r + 1][c]
-        ) {
-            return false;
-        }
     }
+
+
+    return false;
+
 }
 
-return true;
 
+/* =========================================================
+   CHECK WHETHER GAME CAN MOVE
+========================================================= */
+
+function canMove() {
+
+    /*
+     * Check empty cells.
+     */
+
+    for (let row = 0; row < 4; row++) {
+
+        for (let col = 0; col < 4; col++) {
+
+            if (board[row][col] === 0) {
+
+                return true;
+
+            }
+
+        }
+
+    }
+
+
+    /*
+     * Check horizontal matches.
+     */
+
+    for (let row = 0; row < 4; row++) {
+
+        for (let col = 0; col < 3; col++) {
+
+            if (
+                board[row][col] ===
+                board[row][col + 1]
+            ) {
+
+                return true;
+
+            }
+
+        }
+
+    }
+
+
+    /*
+     * Check vertical matches.
+     */
+
+    for (let row = 0; row < 3; row++) {
+
+        for (let col = 0; col < 4; col++) {
+
+            if (
+                board[row][col] ===
+                board[row + 1][col]
+            ) {
+
+                return true;
+
+            }
+
+        }
+
+    }
+
+
+    return false;
 
 }
 
-// ==============================
-// FINISH GAME
-// ==============================
 
-function finishGame() {
+/* =========================================================
+   GAME OVER
+========================================================= */
+
+function endGame() {
+
+    if (gameEnded) {
+
+        return;
+
+    }
 
 
-if (gameOver) {
-    return;
-}
+    gameEnded = true;
 
-gameOver = true;
+    gameStarted = false;
 
-saveScore();
 
-setTimeout(function() {
+    saveScore();
 
-    alert(
-        "GAME OVER\n\n" +
-        "Player: " +
-        playerName +
-        "\nScore: " +
-        score
+
+    setTimeout(
+        function () {
+
+            alert(
+                "GAME OVER!\n\n" +
+                playerName +
+                "'s Score: " +
+                score +
+                "\n\n" +
+                "Enter the next player's name."
+            );
+
+
+            /*
+             * Hide game.
+             */
+
+            gameArea.style.display =
+                "none";
+
+
+            /*
+             * Show player-name screen.
+             */
+
+            playerBox.style.display =
+                "block";
+
+
+            /*
+             * Clear old name.
+             */
+
+            playerNameInput.value =
+                "";
+
+
+            /*
+             * Reset display.
+             */
+
+            playerDisplay.textContent =
+                "Player:";
+
+
+            /*
+             * Reset variables.
+             */
+
+            playerName = "";
+
+            board = [];
+
+            score = 0;
+
+            gameEnded = false;
+
+
+            /*
+             * Put cursor in name box.
+             */
+
+            playerNameInput.focus();
+
+        },
+        200
     );
 
-    showPlayerScreen();
-
-}, 300);
-
-
 }
 
-// ==============================
-// WIN
-// ==============================
 
-function winGame() {
-
-
-if (gameWon) {
-    return;
-}
-
-gameWon = true;
-
-setTimeout(function() {
-
-    alert(
-        "CONGRATULATIONS!\n\n" +
-        "You reached 2048!"
-    );
-
-}, 300);
-
-
-}
-
-// ==============================
-// SHOW NEW PLAYER SCREEN
-// ==============================
-
-function showPlayerScreen() {
-
-
-document.getElementById("gameArea").style.display =
-    "none";
-
-document.getElementById("playerBox").style.display =
-    "block";
-
-var input =
-    document.getElementById("playerName");
-
-input.value = "";
-
-board = [];
-score = 0;
-playerName = "";
-gameOver = false;
-gameWon = false;
-
-setTimeout(function() {
-    input.focus();
-}, 100);
-
-
-}
-
-// ==============================
-// SAVE SCORE
-// ==============================
+/* =========================================================
+   SAVE SCORE
+========================================================= */
 
 function saveScore() {
 
+    if (playerName === "") {
 
-var leaderboard =
-    JSON.parse(
-        localStorage.getItem("leaderboard")
-    ) || [];
+        return;
 
-leaderboard.push({
-    name: playerName,
-    score: score
-});
+    }
 
 
-leaderboard.sort(function(a, b) {
-    return b.score - a.score;
-});
+    leaderboard.push({
+
+        name: playerName,
+
+        score: score
+
+    });
 
 
-// ONLY 6 PLAYERS
-leaderboard =
-    leaderboard.slice(0, 6);
+    /*
+     * Highest score first.
+     */
 
+    leaderboard.sort(
+        function (a, b) {
 
-localStorage.setItem(
-    "leaderboard",
-    JSON.stringify(leaderboard)
-);
+            return b.score - a.score;
 
-showLeaderboard();
-
-
-}
-
-// ==============================
-// DISPLAY LEADERBOARD
-// ==============================
-
-function showLeaderboard() {
-
-
-var body =
-    document.getElementById(
-        "leaderboardBody"
+        }
     );
 
-if (!body) {
-    return;
-}
 
-body.innerHTML = "";
+    /*
+     * ONLY SIX PLAYERS.
+     */
 
-var leaderboard =
-    JSON.parse(
-        localStorage.getItem("leaderboard")
-    ) || [];
+    leaderboard =
+        leaderboard.slice(0, 6);
 
-leaderboard =
-    leaderboard.slice(0, 6);
 
-var i;
+    localStorage.setItem(
+        "peso2048Leaderboard",
+        JSON.stringify(
+            leaderboard
+        )
+    );
 
-for (i = 0; i < leaderboard.length; i++) {
 
-    var row =
-        document.createElement("tr");
-
-    var rank =
-        document.createElement("td");
-
-    rank.innerHTML =
-        i + 1;
-
-    var name =
-        document.createElement("td");
-
-    name.textContent =
-        leaderboard[i].name;
-
-    var playerScore =
-        document.createElement("td");
-
-    playerScore.innerHTML =
-        leaderboard[i].score;
-
-    row.appendChild(rank);
-    row.appendChild(name);
-    row.appendChild(playerScore);
-
-    body.appendChild(row);
-}
-
+    updateLeaderboard();
 
 }
 
-// ==============================
-// KEYBOARD
-// ==============================
 
-document.addEventListener(
-"keydown",
-function(e) {
+/* =========================================================
+   UPDATE LEADERBOARD
+========================================================= */
 
+function updateLeaderboard() {
 
-    var input =
-        document.getElementById("playerName");
-
-
-    // ENTER STARTS GAME
-    if (
-        e.key === "Enter" &&
-        document.activeElement === input
-    ) {
-
-        startPlayerGame();
+    if (!leaderboardBody) {
 
         return;
+
     }
 
 
-    if (gameOver) {
-        return;
-    }
+    leaderboardBody.innerHTML = "";
 
 
-    if (
-        e.key === "ArrowLeft" ||
-        e.key === "ArrowRight" ||
-        e.key === "ArrowUp" ||
-        e.key === "ArrowDown"
-    ) {
-
-        e.preventDefault();
-    }
+    const topSix =
+        leaderboard.slice(0, 6);
 
 
-    if (e.key === "ArrowLeft") {
-        move("left");
-    }
+    topSix.forEach(
+        function (player, index) {
 
-    if (e.key === "ArrowRight") {
-        move("right");
-    }
-
-    if (e.key === "ArrowUp") {
-        move("up");
-    }
-
-    if (e.key === "ArrowDown") {
-        move("down");
-    }
+            const row =
+                document.createElement("tr");
 
 
-    if (e.key === "a" || e.key === "A") {
-        move("left");
-    }
-
-    if (e.key === "d" || e.key === "D") {
-        move("right");
-    }
-
-    if (e.key === "w" || e.key === "W") {
-        move("up");
-    }
-
-    if (e.key === "s" || e.key === "S") {
-        move("down");
-    }
-
-},
-false
+            const rank =
+                document.createElement("td");
 
 
-);
-
-// ==============================
-// MOBILE SWIPE
-// ==============================
-
-var touchStartX = 0;
-var touchStartY = 0;
-
-document.addEventListener(
-"touchstart",
-function(e) {
+            const name =
+                document.createElement("td");
 
 
-    if (
-        e.touches &&
-        e.touches.length > 0
-    ) {
-
-        touchStartX =
-            e.touches[0].clientX;
-
-        touchStartY =
-            e.touches[0].clientY;
-    }
-},
-false
+            const playerScore =
+                document.createElement("td");
 
 
-);
-
-document.addEventListener(
-"touchend",
-function(e) {
+            rank.textContent =
+                index + 1;
 
 
-    if (gameOver) {
-        return;
-    }
-
-    if (
-        !e.changedTouches ||
-        e.changedTouches.length === 0
-    ) {
-        return;
-    }
-
-    var touchEndX =
-        e.changedTouches[0].clientX;
-
-    var touchEndY =
-        e.changedTouches[0].clientY;
+            name.textContent =
+                player.name;
 
 
-    var dx =
-        touchEndX - touchStartX;
-
-    var dy =
-        touchEndY - touchStartY;
+            playerScore.textContent =
+                player.score;
 
 
-    if (
-        Math.abs(dx) < 30 &&
-        Math.abs(dy) < 30
-    ) {
-        return;
-    }
+            row.appendChild(rank);
+
+            row.appendChild(name);
+
+            row.appendChild(
+                playerScore
+            );
 
 
-    if (Math.abs(dx) > Math.abs(dy)) {
+            leaderboardBody.appendChild(
+                row
+            );
 
-        if (dx > 0) {
-            move("right");
-        } else {
-            move("left");
         }
+    );
 
-    } else {
+}
 
-        if (dy > 0) {
-            move("down");
-        } else {
-            move("up");
+
+/* =========================================================
+   ENTER KEY TO START GAME
+========================================================= */
+
+if (playerNameInput) {
+
+    playerNameInput.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (event.key === "Enter") {
+
+                event.preventDefault();
+
+                startPlayerGame();
+
+            }
+
         }
-    }
+    );
 
-},
-false
+}
 
 
-);
+/* =========================================================
+   INITIALIZE
+========================================================= */
 
-// ==============================
-// INITIALIZE
-// ==============================
+updateLeaderboard();
 
-showLeaderboard();
 
-// ==============================
-// MAKE HTML ONCLICK WORK
-// ==============================
+/* =========================================================
+   MAKE FUNCTIONS AVAILABLE TO HTML
+========================================================= */
 
 window.startPlayerGame =
-startPlayerGame;
+    startPlayerGame;
 
 window.newGame =
-newGame;
+    newGame;
+
