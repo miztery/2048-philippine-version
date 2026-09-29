@@ -1,5 +1,5 @@
 /* =========================================================
-   2048 PHILIPPINE PESO VERSION
+   2048 PHILIPPINE PESO VERSION - PRO EDITION
    CGWCEISC-DRDU
 ========================================================= */
 
@@ -8,6 +8,7 @@ let score = 0;
 let playerName = "";
 let gameStarted = false;
 let gameEnded = false;
+let modalCallback = null;
 
 
 /* =========================================================
@@ -41,22 +42,61 @@ const scoreElement = document.getElementById("score");
 const boardElement = document.getElementById("board");
 const leaderboardBody = document.getElementById("leaderboardBody");
 
+const modalOverlay = document.getElementById("modalOverlay");
+const modalTitle = document.getElementById("modalTitle");
+const modalMessage = document.getElementById("modalMessage");
+
 
 /* =========================================================
-   LEADERBOARD
+   CUSTOM MODAL POPUP FUNCTIONS
+========================================================= */
+
+function showModal(title, message, callback = null) {
+
+    if (modalTitle) modalTitle.textContent = title;
+
+    if (modalMessage) modalMessage.textContent = message;
+
+    modalCallback = callback;
+
+    if (modalOverlay) modalOverlay.classList.add("active");
+
+}
+
+
+function closeModal() {
+
+    if (modalOverlay) modalOverlay.classList.remove("active");
+
+    if (modalCallback) {
+
+        const cb = modalCallback;
+
+        modalCallback = null;
+
+        cb();
+
+    }
+
+}
+
+
+window.closeModal = closeModal;
+
+
+/* =========================================================
+   LEADERBOARD STORAGE
 ========================================================= */
 
 let leaderboard = [];
 
 try {
 
-    const savedLeaderboard =
-        localStorage.getItem("peso2048Leaderboard");
+    const savedLeaderboard = localStorage.getItem("peso2048Leaderboard");
 
     if (savedLeaderboard) {
 
-        leaderboard =
-            JSON.parse(savedLeaderboard);
+        leaderboard = JSON.parse(savedLeaderboard);
 
         if (!Array.isArray(leaderboard)) {
 
@@ -79,24 +119,23 @@ try {
 
 function startPlayerGame() {
 
-    const name =
-        playerNameInput.value.trim();
+    const name = playerNameInput.value.trim();
 
 
     if (name === "") {
 
-        alert("Please enter your name first.");
+        showModal("Notice Required", "Please enter your callsign or player name to proceed.", function () {
 
-        playerNameInput.focus();
+            playerNameInput.focus();
+
+        });
 
         return;
 
     }
 
 
-    playerName =
-        name.substring(0, 30);
-
+    playerName = name.substring(0, 30);
 
     score = 0;
 
@@ -105,9 +144,7 @@ function startPlayerGame() {
     gameEnded = false;
 
 
-    playerDisplay.textContent =
-        "Player: " + playerName;
-
+    playerDisplay.textContent = playerName;
 
     playerBox.style.display = "none";
 
@@ -119,14 +156,7 @@ function startPlayerGame() {
 }
 
 
-/*
- * IMPORTANT:
- * Make the function available to
- * onclick="startPlayerGame()"
- */
-
-window.startPlayerGame =
-    startPlayerGame;
+window.startPlayerGame = startPlayerGame;
 
 
 /* =========================================================
@@ -171,12 +201,7 @@ function createNewGame() {
 
 function newGame() {
 
-    if (!gameStarted) {
-
-        return;
-
-    }
-
+    if (!gameStarted) return;
 
     createNewGame();
 
@@ -201,10 +226,7 @@ function addRandomTile() {
 
             if (board[row][col] === 0) {
 
-                emptyCells.push({
-                    row: row,
-                    col: col
-                });
+                emptyCells.push({ row, col });
 
             }
 
@@ -213,25 +235,15 @@ function addRandomTile() {
     }
 
 
-    if (emptyCells.length === 0) {
-
-        return;
-
-    }
+    if (emptyCells.length === 0) return;
 
 
-    const randomIndex =
-        Math.floor(
-            Math.random() * emptyCells.length
-        );
+    const randomIndex = Math.floor(Math.random() * emptyCells.length);
+
+    const cell = emptyCells[randomIndex];
 
 
-    const cell =
-        emptyCells[randomIndex];
-
-
-    board[cell.row][cell.col] =
-        Math.random() < 0.9 ? 2 : 4;
+    board[cell.row][cell.col] = Math.random() < 0.9 ? 2 : 4;
 
 }
 
@@ -249,58 +261,42 @@ function updateBoard() {
 
         for (let col = 0; col < 4; col++) {
 
-            const tile =
-                document.createElement("div");
-
+            const tile = document.createElement("div");
 
             tile.className = "tile";
 
 
-            const value =
-                board[row][col];
+            const value = board[row][col];
 
 
             if (value !== 0) {
 
-                const imgPath =
-                    images[value];
+                const imgPath = images[value];
 
 
                 if (imgPath) {
 
-                    const img =
-                        document.createElement("img");
-
+                    const img = document.createElement("img");
 
                     img.src = imgPath;
 
-                    img.alt =
-                        "₱" + value;
+                    img.alt = "₱" + value;
 
 
-                    img.onerror =
-                        function () {
+                    img.onerror = function () {
 
-                            img.remove();
+                        img.remove();
 
-                            showTileNumber(
-                                tile,
-                                value
-                            );
+                        showTileNumber(tile, value);
 
-                        };
+                    };
 
 
                     tile.appendChild(img);
 
-                }
+                } else {
 
-                else {
-
-                    showTileNumber(
-                        tile,
-                        value
-                    );
+                    showTileNumber(tile, value);
 
                 }
 
@@ -314,8 +310,7 @@ function updateBoard() {
     }
 
 
-    scoreElement.textContent =
-        "Score: " + score;
+    scoreElement.textContent = score.toLocaleString();
 
 }
 
@@ -326,21 +321,14 @@ function updateBoard() {
 
 function showTileNumber(tile, value) {
 
-    const valueElement =
-        document.createElement("div");
+    const valueElement = document.createElement("div");
+
+    valueElement.className = "tileValue";
+
+    valueElement.textContent = "₱" + value;
 
 
-    valueElement.className =
-        "tileValue";
-
-
-    valueElement.textContent =
-        "₱" + value;
-
-
-    tile.appendChild(
-        valueElement
-    );
+    tile.appendChild(valueElement);
 
 }
 
@@ -353,10 +341,30 @@ document.addEventListener(
     "keydown",
     function (event) {
 
-        /*
-         * Prevent the browser from scrolling
-         * when using arrow keys.
-         */
+        if (modalOverlay && modalOverlay.classList.contains("active")) {
+
+            if (event.key === "Enter") {
+
+                event.preventDefault();
+
+                closeModal();
+
+            }
+
+            return;
+
+        }
+
+
+        if (
+            document.activeElement === playerNameInput ||
+            document.activeElement.tagName === "INPUT"
+        ) {
+
+            return;
+
+        }
+
 
         if (
             event.key === "ArrowUp" ||
@@ -370,399 +378,180 @@ document.addEventListener(
         }
 
 
-        /*
-         * Game must be active.
-         */
-
-        if (!gameStarted || gameEnded) {
-
-            return;
-
-        }
+        if (!gameStarted || gameEnded) return;
 
 
-        /*
-         * Don't move the game while typing
-         * the player's name.
-         */
+        if (event.key === "ArrowLeft") moveLeft();
 
-        if (
-            document.activeElement ===
-            playerNameInput
-        ) {
+        else if (event.key === "ArrowRight") moveRight();
 
-            return;
+        else if (event.key === "ArrowUp") moveUp();
 
-        }
-
-
-        if (event.key === "ArrowLeft") {
-
-            moveLeft();
-
-        }
-
-        else if (event.key === "ArrowRight") {
-
-            moveRight();
-
-        }
-
-        else if (event.key === "ArrowUp") {
-
-            moveUp();
-
-        }
-
-        else if (event.key === "ArrowDown") {
-
-            moveDown();
-
-        }
+        else if (event.key === "ArrowDown") moveDown();
 
     },
-    {
-        passive: false
-    }
+
+    { passive: false }
+
 );
 
 
 /* =========================================================
-   MOVE LEFT
+   MOVE LOGIC
 ========================================================= */
 
 function moveLeft() {
 
     let moved = false;
 
-
     for (let row = 0; row < 4; row++) {
 
-        const oldLine =
-            [...board[row]];
+        const oldLine = [...board[row]];
 
+        let line = board[row].filter(v => v !== 0);
 
-        let line =
-            board[row].filter(
-                value => value !== 0
-            );
+        line = mergeLine(line);
 
+        while (line.length < 4) line.push(0);
 
-        line =
-            mergeLine(line);
+        board[row] = line;
 
-
-        while (line.length < 4) {
-
-            line.push(0);
-
-        }
-
-
-        board[row] =
-            line;
-
-
-        if (
-            JSON.stringify(oldLine) !==
-            JSON.stringify(line)
-        ) {
-
-            moved = true;
-
-        }
+        if (JSON.stringify(oldLine) !== JSON.stringify(line)) moved = true;
 
     }
-
 
     afterMove(moved);
 
 }
 
-
-/* =========================================================
-   MOVE RIGHT
-========================================================= */
 
 function moveRight() {
 
     let moved = false;
 
-
     for (let row = 0; row < 4; row++) {
 
-        const oldLine =
-            [...board[row]];
+        const oldLine = [...board[row]];
 
-
-        let line =
-            board[row].filter(
-                value => value !== 0
-            );
-
+        let line = board[row].filter(v => v !== 0);
 
         line.reverse();
 
+        line = mergeLine(line);
 
-        line =
-            mergeLine(line);
-
-
-        while (line.length < 4) {
-
-            line.push(0);
-
-        }
-
+        while (line.length < 4) line.push(0);
 
         line.reverse();
 
+        board[row] = line;
 
-        board[row] =
-            line;
-
-
-        if (
-            JSON.stringify(oldLine) !==
-            JSON.stringify(line)
-        ) {
-
-            moved = true;
-
-        }
+        if (JSON.stringify(oldLine) !== JSON.stringify(line)) moved = true;
 
     }
-
 
     afterMove(moved);
 
 }
 
-
-/* =========================================================
-   MOVE UP
-========================================================= */
 
 function moveUp() {
 
     let moved = false;
 
-
     for (let col = 0; col < 4; col++) {
 
-        const oldLine = [
-
-            board[0][col],
-            board[1][col],
-            board[2][col],
-            board[3][col]
-
-        ];
-
+        const oldLine = [board[0][col], board[1][col], board[2][col], board[3][col]];
 
         let line = [];
 
-
         for (let row = 0; row < 4; row++) {
 
-            if (board[row][col] !== 0) {
-
-                line.push(
-                    board[row][col]
-                );
-
-            }
+            if (board[row][col] !== 0) line.push(board[row][col]);
 
         }
 
+        line = mergeLine(line);
 
-        line =
-            mergeLine(line);
+        while (line.length < 4) line.push(0);
 
+        for (let row = 0; row < 4; row++) board[row][col] = line[row];
 
-        while (line.length < 4) {
+        const newLine = [board[0][col], board[1][col], board[2][col], board[3][col]];
 
-            line.push(0);
-
-        }
-
-
-        for (let row = 0; row < 4; row++) {
-
-            board[row][col] =
-                line[row];
-
-        }
-
-
-        const newLine = [
-
-            board[0][col],
-            board[1][col],
-            board[2][col],
-            board[3][col]
-
-        ];
-
-
-        if (
-            JSON.stringify(oldLine) !==
-            JSON.stringify(newLine)
-        ) {
-
-            moved = true;
-
-        }
+        if (JSON.stringify(oldLine) !== JSON.stringify(newLine)) moved = true;
 
     }
-
 
     afterMove(moved);
 
 }
 
-
-/* =========================================================
-   MOVE DOWN
-========================================================= */
 
 function moveDown() {
 
     let moved = false;
 
-
     for (let col = 0; col < 4; col++) {
 
-        const oldLine = [
-
-            board[0][col],
-            board[1][col],
-            board[2][col],
-            board[3][col]
-
-        ];
-
+        const oldLine = [board[0][col], board[1][col], board[2][col], board[3][col]];
 
         let line = [];
 
-
         for (let row = 3; row >= 0; row--) {
 
-            if (board[row][col] !== 0) {
-
-                line.push(
-                    board[row][col]
-                );
-
-            }
+            if (board[row][col] !== 0) line.push(board[row][col]);
 
         }
 
+        line = mergeLine(line);
 
-        line =
-            mergeLine(line);
+        while (line.length < 4) line.push(0);
 
+        for (let row = 3; row >= 0; row--) board[row][col] = line[3 - row];
 
-        while (line.length < 4) {
+        const newLine = [board[0][col], board[1][col], board[2][col], board[3][col]];
 
-            line.push(0);
-
-        }
-
-
-        for (let row = 3; row >= 0; row--) {
-
-            board[row][col] =
-                line[3 - row];
-
-        }
-
-
-        const newLine = [
-
-            board[0][col],
-            board[1][col],
-            board[2][col],
-            board[3][col]
-
-        ];
-
-
-        if (
-            JSON.stringify(oldLine) !==
-            JSON.stringify(newLine)
-        ) {
-
-            moved = true;
-
-        }
+        if (JSON.stringify(oldLine) !== JSON.stringify(newLine)) moved = true;
 
     }
-
 
     afterMove(moved);
 
 }
 
 
-/* =========================================================
-   MERGE LINE
-========================================================= */
-
 function mergeLine(line) {
 
     const result = [];
 
-
     for (let i = 0; i < line.length; i++) {
 
-        if (
-            i + 1 < line.length &&
-            line[i] === line[i + 1]
-        ) {
+        if (i + 1 < line.length && line[i] === line[i + 1]) {
 
-            const merged =
-                line[i] * 2;
-
+            const merged = line[i] * 2;
 
             result.push(merged);
 
-
             score += merged;
-
 
             i++;
 
-        }
+        } else {
 
-        else {
-
-            result.push(
-                line[i]
-            );
+            result.push(line[i]);
 
         }
 
     }
-
 
     return result;
 
 }
 
 
-/* =========================================================
-   AFTER MOVE
-========================================================= */
-
 function afterMove(moved) {
 
-    if (!moved) {
-
-        return;
-
-    }
-
+    if (!moved) return;
 
     addRandomTile();
 
@@ -771,37 +560,21 @@ function afterMove(moved) {
 
     if (has2048()) {
 
-        setTimeout(
-            function () {
+        setTimeout(function () {
 
-                alert(
-                    "Congratulations " +
-                    playerName +
-                    "!\n\n" +
-                    "You reached ₱2048!"
-                );
+            showModal("Victory Reached!", "Congratulations " + playerName + "!\n\nYou successfully matched ₱2048!");
 
-            },
-            100
-        );
+        }, 100);
 
         return;
 
     }
 
 
-    if (!canMove()) {
-
-        endGame();
-
-    }
+    if (!canMove()) endGame();
 
 }
 
-
-/* =========================================================
-   CHECK 2048
-========================================================= */
 
 function has2048() {
 
@@ -809,87 +582,46 @@ function has2048() {
 
         for (let col = 0; col < 4; col++) {
 
-            if (
-                board[row][col] === 2048
-            ) {
-
-                return true;
-
-            }
+            if (board[row][col] === 2048) return true;
 
         }
 
     }
-
 
     return false;
 
 }
 
 
-/* =========================================================
-   CHECK WHETHER GAME CAN MOVE
-========================================================= */
-
 function canMove() {
-
-    /*
-     * Check empty cells.
-     */
 
     for (let row = 0; row < 4; row++) {
 
         for (let col = 0; col < 4; col++) {
 
-            if (board[row][col] === 0) {
-
-                return true;
-
-            }
+            if (board[row][col] === 0) return true;
 
         }
 
     }
 
-
-    /*
-     * Check horizontal matches.
-     */
 
     for (let row = 0; row < 4; row++) {
 
         for (let col = 0; col < 3; col++) {
 
-            if (
-                board[row][col] ===
-                board[row][col + 1]
-            ) {
-
-                return true;
-
-            }
+            if (board[row][col] === board[row][col + 1]) return true;
 
         }
 
     }
 
 
-    /*
-     * Check vertical matches.
-     */
-
     for (let row = 0; row < 3; row++) {
 
         for (let col = 0; col < 4; col++) {
 
-            if (
-                board[row][col] ===
-                board[row + 1][col]
-            ) {
-
-                return true;
-
-            }
+            if (board[row][col] === board[row + 1][col]) return true;
 
         }
 
@@ -907,12 +639,7 @@ function canMove() {
 
 function endGame() {
 
-    if (gameEnded) {
-
-        return;
-
-    }
-
+    if (gameEnded) return;
 
     gameEnded = true;
 
@@ -922,241 +649,137 @@ function endGame() {
     saveScore();
 
 
-    setTimeout(
-        function () {
+    setTimeout(function () {
 
-            alert(
-                "GAME OVER!\n\n" +
-                playerName +
-                "'s Score: " +
-                score +
-                "\n\n" +
-                "Enter the next player's name."
-            );
+        showModal(
 
+            "Game Over",
 
-            /*
-             * Hide game.
-             */
+            playerName + "'s Score: " + score.toLocaleString() ,
 
-            gameArea.style.display =
-                "none";
+            function () {
 
+                gameArea.style.display = "none";
 
-            /*
-             * Show player-name screen.
-             */
+                playerBox.style.display = "block";
 
-            playerBox.style.display =
-                "block";
+                playerNameInput.value = "";
+
+                playerDisplay.textContent = "---";
+
+                playerName = "";
+
+                board = [];
+
+                score = 0;
+
+                gameEnded = false;
 
 
-            /*
-             * Clear old name.
-             */
+                setTimeout(() => {
 
-            playerNameInput.value =
-                "";
+                    playerNameInput.focus();
 
+                }, 50);
 
-            /*
-             * Reset display.
-             */
+            }
 
-            playerDisplay.textContent =
-                "Player:";
+        );
 
-
-            /*
-             * Reset variables.
-             */
-
-            playerName = "";
-
-            board = [];
-
-            score = 0;
-
-            gameEnded = false;
-
-
-            /*
-             * Put cursor in name box.
-             */
-
-            playerNameInput.focus();
-
-        },
-        200
-    );
+    }, 200);
 
 }
 
 
 /* =========================================================
-   SAVE SCORE
+   LEADERBOARD LOGIC
 ========================================================= */
 
 function saveScore() {
 
-    if (playerName === "") {
+    if (playerName === "") return;
 
-        return;
+    leaderboard.push({ name: playerName, score: score });
 
-    }
+    leaderboard.sort((a, b) => b.score - a.score);
 
-
-    leaderboard.push({
-
-        name: playerName,
-
-        score: score
-
-    });
+    leaderboard = leaderboard.slice(0, 6);
 
 
-    /*
-     * Highest score first.
-     */
-
-    leaderboard.sort(
-        function (a, b) {
-
-            return b.score - a.score;
-
-        }
-    );
-
-
-    /*
-     * ONLY SIX PLAYERS.
-     */
-
-    leaderboard =
-        leaderboard.slice(0, 6);
-
-
-    localStorage.setItem(
-        "peso2048Leaderboard",
-        JSON.stringify(
-            leaderboard
-        )
-    );
-
+    localStorage.setItem("peso2048Leaderboard", JSON.stringify(leaderboard));
 
     updateLeaderboard();
 
 }
 
 
-/* =========================================================
-   UPDATE LEADERBOARD
-========================================================= */
-
 function updateLeaderboard() {
 
-    if (!leaderboardBody) {
-
-        return;
-
-    }
-
+    if (!leaderboardBody) return;
 
     leaderboardBody.innerHTML = "";
 
 
-    const topSix =
-        leaderboard.slice(0, 6);
+    const topSix = leaderboard.slice(0, 6);
+
+    topSix.forEach((player, index) => {
+
+        const row = document.createElement("tr");
+
+        const rank = document.createElement("td");
+
+        const name = document.createElement("td");
+
+        const playerScore = document.createElement("td");
 
 
-    topSix.forEach(
-        function (player, index) {
+        rank.textContent = "#" + (index + 1);
 
-            const row =
-                document.createElement("tr");
+        name.textContent = player.name;
 
-
-            const rank =
-                document.createElement("td");
+        playerScore.textContent = player.score.toLocaleString();
 
 
-            const name =
-                document.createElement("td");
+        row.appendChild(rank);
+
+        row.appendChild(name);
+
+        row.appendChild(playerScore);
 
 
-            const playerScore =
-                document.createElement("td");
+        leaderboardBody.appendChild(row);
 
-
-            rank.textContent =
-                index + 1;
-
-
-            name.textContent =
-                player.name;
-
-
-            playerScore.textContent =
-                player.score;
-
-
-            row.appendChild(rank);
-
-            row.appendChild(name);
-
-            row.appendChild(
-                playerScore
-            );
-
-
-            leaderboardBody.appendChild(
-                row
-            );
-
-        }
-    );
+    });
 
 }
 
 
 /* =========================================================
-   ENTER KEY TO START GAME
+   EVENT LISTENERS & INIT
 ========================================================= */
 
 if (playerNameInput) {
 
-    playerNameInput.addEventListener(
-        "keydown",
-        function (event) {
+    playerNameInput.addEventListener("keydown", function (event) {
 
-            if (event.key === "Enter") {
+        if (event.key === "Enter") {
 
-                event.preventDefault();
+            event.preventDefault();
 
-                startPlayerGame();
-
-            }
+            startPlayerGame();
 
         }
-    );
+
+    });
 
 }
 
 
-/* =========================================================
-   INITIALIZE
-========================================================= */
-
 updateLeaderboard();
 
 
-/* =========================================================
-   MAKE FUNCTIONS AVAILABLE TO HTML
-========================================================= */
+window.startPlayerGame = startPlayerGame;
 
-window.startPlayerGame =
-    startPlayerGame;
+window.newGame = newGame;
 
-window.newGame =
-    newGame;
-
+window.closeModal = closeModal;
