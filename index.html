@@ -11,8 +11,13 @@
     >
 
     <title>
-        2048 Philippine PESO Version by CGWCEISC-DRDU
+        2048 Philippine PESO Version
     </title>
+
+    <!-- Google Fonts for modern typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <link
         rel="stylesheet"
@@ -24,293 +29,307 @@
 
 <body>
 
-
-    <!-- =====================================================
-         TITLE
-    ====================================================== -->
-
-    <h1>
-        2048 Philippine PESO Version
-    </h1>
+    <!-- Dynamic Background Accent Blobs -->
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
 
 
     <!-- =====================================================
-         PLAYER NAME
+         HEADER / NAVBAR
     ====================================================== -->
 
-    <div id="playerBox">
+    <header class="app-header">
 
-        <h2>
-            Enter Player Name
-        </h2>
+        <div class="header-brand">
 
+        
 
-        <input
-            id="playerName"
-            type="text"
-            placeholder="Player Name"
-            maxlength="30"
-            autocomplete="off"
-        >
+            <h1>2048 <span class="accent-text">Philippine PESO Version</span></h1>
+            <span class="brand-badge"> V 2.0</span>
+        </div>
 
 
-        <br>
-        <br>
+        <!-- GAME INFO TRIGGER -->
 
+        <div id="gameInfoContainer" tabindex="0">
 
-        <button onclick="startPlayerGame()">
-            START GAME
-        </button>
+            <button id="gameInfoButton" type="button">
 
-    </div>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
 
+                <span>Info</span>
 
-    <!-- =====================================================
-         MAIN GAME LAYOUT
-    ====================================================== -->
-
-    <div id="gameLayout">
-
-
-        <!-- =================================================
-             GAME AREA
-        ================================================== -->
-
-        <div id="gameArea">
-
-            <h2 id="playerDisplay">
-                Player:
-            </h2>
-
-
-            <div id="score">
-                Score: 0
-            </div>
-
-
-            <!-- 2048 BOARD -->
-
-            <div id="board">
-
-                <div class="tile"></div>
-                <div class="tile"></div>
-                <div class="tile"></div>
-                <div class="tile"></div>
-
-                <div class="tile"></div>
-                <div class="tile"></div>
-                <div class="tile"></div>
-                <div class="tile"></div>
-
-                <div class="tile"></div>
-                <div class="tile"></div>
-                <div class="tile"></div>
-                <div class="tile"></div>
-
-                <div class="tile"></div>
-                <div class="tile"></div>
-                <div class="tile"></div>
-                <div class="tile"></div>
-
-            </div>
-
-
-            <br>
-
-
-            <button onclick="newGame()">
-                NEW GAME
             </button>
 
+
+            <!-- INFORMATION PANEL -->
+
+            <div id="gameInfoPanel">
+
+                <h2>ℹ️ Game Information</h2>
+
+
+                <div id="gameInfoContent">
+
+                    <div class="infoBox">
+                        <div class="infoIcon">👨‍💻</div>
+                        <div class="infoText">
+                            <strong>Developer</strong>
+                            <span>CGWCEISC-DRDU</span>
+                            <span>SN2 Cadano PCG</span>
+                        </div>
+                    </div>
+
+                    <div class="infoBox">
+                        <div class="infoIcon">📌</div>
+                        <div class="infoText">
+                            <strong>Version</strong>
+                            <span>Version 2.0</span>
+                        </div>
+                    </div>
+
+                    <div class="infoBox">
+                        <div class="infoIcon">🛡️</div>
+                        <div class="infoText">
+                            <strong>Unit</strong>
+                            <span>CGWCEISC-DRDU</span>
+                            <span>Doctrine, Research & Dev</span>
+                        </div>
+                    </div>
+
+                    <div class="infoBox">
+                        <div class="infoIcon">©️</div>
+                        <div class="infoText">
+                            <strong>Copyright</strong>
+                            <span>© 2026 CGWCEISC-DRDU</span>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
 
-
-        <!-- =================================================
-             LEADERBOARD
-        ================================================== -->
-
-        <div id="leaderboardBox">
-
-            <h2>
-                🏆 Leaderboard
-            </h2>
-
-
-            <table id="leaderboard">
-
-                <thead>
-
-                    <tr>
-
-                        <th>
-                            Rank
-                        </th>
-
-                        <th>
-                            Player
-                        </th>
-
-                        <th>
-                            Score
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody id="leaderboardBody">
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-
-    </div>
+    </header>
 
 
     <!-- =====================================================
-         GAME INFORMATION HOVER BUTTON
+         MAIN CONTAINER
     ====================================================== -->
 
-    <div
-        id="gameInfoContainer"
-        tabindex="0"
-    >
-
-
-        <!-- HOVER BUTTON -->
-
-        <button
-            id="gameInfoButton"
-            type="button"
-        >
-            ℹ️
-        </button>
+    <main class="main-container">
 
 
         <!-- =================================================
-             INFORMATION PANEL
+             PLAYER ENTRY SCREEN
         ================================================== -->
 
-        <div id="gameInfoPanel">
+        <section id="playerBox" class="glass-card">
 
+            <div class="card-header">
 
-            <h2>
-                ℹ️ Game Information
-            </h2>
+                <h2>Welcome Player</h2>
 
-
-            <div id="gameInfoContent">
-
-
-                <!-- DEVELOPER -->
-
-                <div class="infoBox">
-
-                    <div class="infoIcon">
-                        👨‍💻
-                    </div>
-
-                    <div class="infoText">
-
-                        <strong>
-                            Developer
-                        </strong>
-
-                        <span>
-                            CGWCEISC-DRDU
-                        </span>
-                        <span>
-                            SN2 Cadano PCG
-                        </span>
-                    </div>
-
-                </div>
-
-
-                <!-- VERSION -->
-
-                <div class="infoBox">
-
-                    <div class="infoIcon">
-                        📌
-                    </div>
-
-                    <div class="infoText">
-
-                        <strong>
-                            Version
-                        </strong>
-
-                        <span>
-                            Version 1.0
-                        </span>
-
-                    </div>
-
-                </div>
-
-
-                <!-- UNIT -->
-
-                <div class="infoBox">
-
-                    <div class="infoIcon">
-                        🛡️
-                    </div>
-
-                    <div class="infoText">
-
-                        <strong>
-                            Unit
-                        </strong>
-
-                        <span>
-                            CGWCEISC-DRDU
-                        </span>
-                        <span>
-                            Doctrine, Research and Development Unit
-                        </span>
-
-                    </div>
-
-                </div>
-
-
-                
-
-
-                <!-- COPYRIGHT -->
-
-                <div class="infoBox">
-
-                    <div class="infoIcon">
-                        ©️
-                    </div>
-
-                    <div class="infoText">
-
-                        <strong>
-                            Copyright
-                        </strong>
-
-                        <span>
-                            © 2026 CGWCEISC-DRDU
-                        </span>
-
-                    </div>
-
-                </div>
-
+                <p>Enter your callsign to launch the game session.</p>
 
             </div>
 
 
+            <div class="input-group">
+
+                <input
+                    id="playerName"
+                    type="text"
+                    placeholder="Enter Player Name"
+                    maxlength="30"
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <button class="btn btn-primary btn-large" onclick="startPlayerGame()">
+
+                <span>START GAME</span>
+
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+
+            </button>
+
+        </section>
+
+
+        <!-- =================================================
+             MAIN DASHBOARD LAYOUT
+        ================================================== -->
+
+        <div id="gameLayout">
+
+
+            <!-- =============================================
+                 GAME AREA
+            ============================================== -->
+
+            <section id="gameArea" class="glass-card">
+
+                <div class="game-dashboard-bar">
+
+                    <div class="player-pill">
+
+                        <span class="pill-label">PLAYER</span>
+
+                        <span id="playerDisplay" class="pill-value">---</span>
+
+                    </div>
+
+
+                    <div class="score-card">
+
+                        <span class="score-label">SCORE</span>
+
+                        <span id="score" class="score-value">0</span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- 2048 BOARD -->
+
+                <div class="board-wrapper">
+
+                    <div id="board">
+
+                        <div class="tile"></div>
+                        <div class="tile"></div>
+                        <div class="tile"></div>
+                        <div class="tile"></div>
+
+                        <div class="tile"></div>
+                        <div class="tile"></div>
+                        <div class="tile"></div>
+                        <div class="tile"></div>
+
+                        <div class="tile"></div>
+                        <div class="tile"></div>
+                        <div class="tile"></div>
+                        <div class="tile"></div>
+
+                        <div class="tile"></div>
+                        <div class="tile"></div>
+                        <div class="tile"></div>
+                        <div class="tile"></div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="game-controls">
+
+                    <button id="undoBtn" class="btn btn-secondary" onclick="undoMove()" disabled>
+
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 7v6h6"></path>
+                            <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path>
+                        </svg>
+
+                        <span>UNDO</span>
+
+                    </button>
+
+
+                    <button class="btn btn-secondary" onclick="newGame()">
+
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+                        </svg>
+
+                        <span>RESET BOARD</span>
+
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- =============================================
+                 LEADERBOARD
+            ============================================== -->
+
+            <aside id="leaderboardBox" class="glass-card">
+
+                <div class="card-header border-bottom">
+
+                    <h2>🏆 Leaderboard</h2>
+
+                    <span class="sub-caption">Top 6 High Scores</span>
+
+                </div>
+
+
+                <div class="table-responsive">
+
+                    <table id="leaderboard">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>RANK</th>
+
+                                <th>PLAYER</th>
+
+                                <th class="text-right">SCORE</th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="leaderboardBody">
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </aside>
+
+
         </div>
 
+
+    </main>
+
+
+    <!-- =====================================================
+         CUSTOM MODAL POPUP
+    ====================================================== -->
+
+    <div id="modalOverlay" class="modal-overlay">
+
+        <div class="modal-box glass-card">
+
+            <div class="modal-icon">🔔</div>
+
+            <h3 id="modalTitle">Notice</h3>
+
+            <p id="modalMessage"></p>
+
+            <button id="modalButton" class="btn btn-primary" onclick="closeModal()">EXIT</button>
+
+        </div>
 
     </div>
 
